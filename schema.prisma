@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model DownloadHistory {
+  id        String   @id @default(uuid())
+  url       String
+  type      String
+  timestamp DateTime @default(now())
+  mode      String   // "history" or "private"
+  sessionId String   // For history mode, to group downloads by session
+}
+
+model AdUnlock {
+  sessionId  String   @id
+  url        String   @id
+  unlockedAt DateTime @default(now())
+  expiresAt  DateTime
+
+  @@unique([sessionId, url])
+}
+
+model UserDownloads {
+  id        String   @id @default(uuid())
+  userId    String
+  url       String
+  createdAt DateTime @default(now())
+  type      String   // 'file', 'torrent', or 'part'
+  partNumber Int?    // For split files
+
+  @@index([userId])
+} 
